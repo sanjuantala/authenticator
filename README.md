@@ -1,138 +1,118 @@
-# Totem: your own 2FA authenticator
+# Totem
 
-A private authenticator you own end to end: a **menu bar Mac app** and a **Chrome/Brave/Edge/Arc extension**. Both share **one encrypted vault**, sync directly on your Mac, and back up to **your Google Drive**. No third-party servers.
+A private two-factor authenticator for **macOS** and **Chromium browsers** (Chrome, Brave, Edge, Arc).
+A menu bar app and a browser extension share one encrypted vault, sync on your Mac, and back up to your own Google Drive. No accounts, no servers.
 
-```
- Browser extension ──native messaging──► TotemBridge ──private socket──► Totem.app (menu bar)
-        │                                                                     │
-        └──────────── encrypted vault file in your Google Drive ◄─────────────┘
-```
+## Features
 
-## What it does
+- **Codes everywhere**: menu bar app, browser popup, and a Spotlight-style quick search (`⌥⌘2`)
+- **One-click fill** on 2FA fields, with anti-phishing: codes fill only on sites you've saved
+- **Scan QR codes from your screen**, no phone needed
+- **Touch ID**, secured by the Mac's Secure Enclave
+- **Import** from Google Authenticator, Aegis, 2FAS, Bitwarden and `otpauth://` links
+- **Encrypted backup** to Google Drive, iCloud Drive or any synced folder
+- **One-click updates** for both the app and the extension
 
-| | Extension | Mac app |
-|---|---|---|
-| Codes with countdown ring, search, click to copy | ✓ | ✓ |
-| Unique "sigil" per service (same look on both) | ✓ | ✓ |
-| **Auto-fill**: a Totem button appears on 2FA fields; one click fills the code (split digit boxes too) | ✓ | No |
-| **Scan QR from screen**, no phone needed | open tab | any screen, any app |
-| **Global hotkey** quick search (Spotlight-style): Enter copies, ⇧Enter *types* the code into the app you're in | `Alt+Shift+T` opens, `Alt+Shift+F` fills | `⌥⌘2` (changeable) |
-| Unlock with **Touch ID** | via the Mac app | ✓ |
-| Import: Google Authenticator transfer QR, Aegis, 2FAS, Bitwarden, otpauth links, Totem backups | ✓ | ✓ |
-| Export: encrypted `.totem` backup, plain otpauth list, per-account QR to move to a phone | ✓ | ✓ |
-| Google Drive sync + 30 days of dated backups, restore any of them | ✓ | ✓ |
-| Copied codes hidden from clipboard managers and auto-cleared | cleared | hidden + cleared |
-| Auto-lock (timer, screen lock, sleep) | ✓ | ✓ |
-| Hands out the *next* code in the last 2–3 seconds so it never expires mid-paste | ✓ | ✓ |
+## Install
 
-## 1 · Install (one line, about 2 minutes)
-
-Needs macOS 14+ and Apple's Command Line Tools (`xcode-select --install`). Full Xcode is not needed.
-
-Paste this in Terminal:
+Requires macOS 14 or later and Apple's Command Line Tools (full Xcode isn't needed).
 
 ```bash
+xcode-select --install   # only if you don't have the Command Line Tools yet
 curl -fsSL https://raw.githubusercontent.com/sanjuantala/authenticator/main/get.sh | bash
 ```
 
-It downloads the latest version from this repo and installs everything:
-* keeps the source in `~/Totem/source`, so later updates build faster,
-* updates the extension in whatever folder your browsers already load it from (any Chromium browser),
-* builds `Totem.app`, puts it in `/Applications`, and starts it. The Totem mark appears in your menu bar.
+This downloads the latest version, builds `Totem.app` into `/Applications` and opens it. Look for the Totem mark in your menu bar.
 
-If the extension isn't loaded yet: open `chrome://extensions`, turn on **Developer mode**, click **Load unpacked**, and choose `~/Totem/source/extension` (press ⌘⇧G in the picker and paste the path). Then in Totem for Mac, go to **Settings → Backup & Browser → Connect browsers**, and in the extension choose **Use my Mac's vault with Touch ID**.
+### Add the browser extension (once)
 
-Prefer to look before you run? Download the ZIP (**Code → Download ZIP**), read `install.sh`, then run `bash install.sh` from the unzipped folder.
+1. Open `chrome://extensions` and turn on **Developer mode**.
+2. Click **Load unpacked**, press `⌘⇧G`, paste `~/Totem/source/extension` and choose it.
+3. In Totem for Mac: **Settings → Backup & Browser → Connect browsers**.
+4. In the extension popup: **Use my Mac's vault with Touch ID**.
 
-## 2 · Updating (one click)
+## Update
 
-Totem checks this repo for new versions. When one is out, **Install update** appears at the bottom of Totem's menu. Click it: Totem downloads the update, installs it and restarts in about a minute. The browser extension notices its new files and reloads itself; unlock it once afterwards.
+Click **Install update** at the bottom of Totem's menu when it appears. Totem checks GitHub at most once an hour; to check now, use **Settings → General → Check for updates**. The extension reloads itself, so just unlock it once afterwards.
 
-You can also check by hand in **Settings → General → Check for updates**, or run the same one-line command again. The update log is at `~/Library/Logs/Totem/update.log`.
+## Back up to Google Drive
 
-## 3 · Google Drive backup (one click)
+1. Install [Google Drive for desktop](https://www.google.com/drive/download/) and sign in.
+2. In Totem: **Settings → Backup & Browser → Back up to Google Drive**.
 
-1. Install **Google Drive for desktop** (<https://www.google.com/drive/download/>) and sign in. Most people already have it.
-2. In Totem for Mac, go to **Settings → Backup & Browser** and click **Back up to Google Drive**. That's it.
+Totem saves an encrypted copy into `My Drive/Totem/`, plus a dated backup each day (the newest 30 are kept). Google only ever sees encrypted data. To restore, use **Settings → Restore…**. It only adds back missing accounts and never deletes any.
 
-Totem writes an encrypted copy into your Drive folder, and Google's own app uploads it. There's no Google Cloud project, no API keys, and no sign-in inside Totem. The browser extension shows the Mac's backup status and syncs through the Mac. iCloud Drive, Dropbox, or any synced folder works the same way ("Choose another folder…").
+## Everyday use
 
-What lands in your Drive:
+| Action | Mac | Browser |
+|---|---|---|
+| Copy a code | Click it, or `⌥⌘2` → type → `Enter` | Click it, or `Alt+Shift+T` → type → `Enter` |
+| Type a code into the current app | `⌥⌘2` → `⇧Enter` | |
+| Fill a 2FA field | | Click the Totem button in the field, or `Alt+Shift+F` |
+| Add an account | **+ → Scan screen for a QR code** | **+ → Scan this page** |
+| Allow auto-fill on a site | Edit the account → **Sites for browser auto-fill** | Same, or confirm once when asked |
 
-```
-My Drive/Totem/
-  totem-vault.json                       ← the live, encrypted vault (merged on every sync)
-  backups/totem-backup-2026-11-03.json   ← one per day plus "Back up now" snapshots, newest 30 kept
-```
+## Commands
 
-**Restore:** *Settings → Restore…* brings back any account that's missing from a backup. It never deletes anything. On a new Mac, install Totem, create a vault with the **same master password**, turn on backup, and choose **Join and merge** when Totem offers it.
-
-<details><summary>Advanced: Google Drive without the Drive app (Google Cloud OAuth)</summary>
-
-Only needed if you can't install Google Drive for desktop, or want the browser to back up on its own without the Mac.
-
-1. In <https://console.cloud.google.com/>, create a project and enable the **Google Drive API**.
-2. **OAuth consent screen**: External, scope `.../auth/drive.file`, add yourself as a test user, then **Publish app**.
-3. Create OAuth clients *in the same project*:
-   * **Desktop app**, for the Mac: Settings → Backup & Browser → Advanced.
-   * **Web application**, for the extension, with redirect URI `https://mdbaiajlghmojiingboeggblieidhpen.chromiumapp.org/oauth2`: extension Settings → "Back up from this browser without the Mac app".
-</details>
-
-## Security model
-
-**What protects your codes**
-
-| Layer | How |
+| What | Command |
 |---|---|
-| Encryption at rest | AES-256-GCM. The key comes from your master password via PBKDF2-SHA256 with 600,000 rounds. The vault is encrypted everywhere it lives: on the Mac, in browser storage, in Google Drive, and in exports. Google only ever stores scrambled data. |
-| Master password | At least 10 characters and rated "Fair" or better by a built-in strength meter. It never leaves your devices and is never stored. |
-| Touch ID (Mac) | The vault key is sealed by the Mac's **Secure Enclave** chip. The chip refuses to release it without Touch ID or your Mac password, and the sealed file is useless on any other Mac. |
-| Anti-phishing auto-fill | Codes fill automatically only on sites saved for that account. On any other site, even one with "github" in its address, Totem shows the **real address** and asks first, then remembers that site. |
-| Browser isolation | Secrets stay in the extension's background worker, and the key is held in memory only. Web pages never see secrets. A page can only ask "the code for *this* site", and Chrome (not the page) reports which site it is. |
-| Mac ⇄ browser channel | A private socket (owner-only permissions). Only Chrome, and only for the Totem extension ID, can launch the bridge. The app checks the **code signature** of whatever connects and accepts only the genuine TotemBridge from inside Totem.app. Vaults always travel encrypted. Unlocking the browser through the Mac requires Touch ID every time. |
-| Locking | Auto-lock after a set time, and on screen lock and sleep. |
-| Clipboard | Copied codes are cleared after 30 seconds. On the Mac they're also marked so clipboard managers don't keep them. |
-| Shoulder-surfing | Optional "Hide codes until hovered". |
-| Integrity | GCM authentication detects any tampering with a vault file. Every overwrite from the browser keeps the previous file (`vault.before-*.json`). |
+| Install or update | `curl -fsSL https://raw.githubusercontent.com/sanjuantala/authenticator/main/get.sh \| bash` |
+| Install from a downloaded ZIP | `cd ~/Downloads && unzip -oq authenticator-main.zip && bash authenticator-main/install.sh` |
+| Install with git | `git clone https://github.com/sanjuantala/authenticator.git ~/Totem/source && bash ~/Totem/source/install.sh` |
+| Rebuild the Mac app only | `cd ~/Totem/source/mac && ./scripts/build-app.sh` |
+| Rebuild without the self-check | `cd ~/Totem/source/mac && SKIP_TESTS=1 ./scripts/build-app.sh` |
+| See the last update's log | `tail -50 ~/Library/Logs/Totem/update.log` |
+| Quit Totem | `pkill -x Totem` (or `⌘Q` in its menu) |
+| Remove old build copies | `rm -rf ~/Totem/source/mac/build` |
 
-**What it can't protect against (no authenticator can)**
-* **Malware running as you on your Mac**, such as a keylogger or screen recorder, while Totem is unlocked. Keep macOS updated and install apps only from sources you trust.
-* **Losing your master password.** It can't be reset. Keep an encrypted `.totem` export and your sites' recovery codes somewhere safe.
-* **Having 2FA codes and passwords in one place.** If someone gets your password manager *and* Totem, 2FA no longer adds protection. Keep them separate. That's one reason this is its own app.
+<details>
+<summary><b>Uninstall</b></summary>
 
-**Your habits matter most**
-1. Use a long passphrase, like four random words.
-2. Save each site in the account's *Sites for auto-fill*, so auto-fill never needs to ask.
-3. If Totem asks "Check the address", read the address before clicking Fill.
-4. Never paste a code into a site you reached from an email link.
-
-## Daily use
-
-* **Browser:** on a 2FA page, click the small shield in the code field. Or press `Alt+Shift+F`, or right-click → *Fill 2FA code with Totem*. Matching uses the account's **Websites** list (Edit → "Websites for auto-fill"), with a fallback to the service name.
-* **Mac:** press `⌥⌘2` anywhere, type a few letters, hit Enter (copy) or ⇧Enter (type it in).
-* **Add an account:** open the site's 2FA setup page, then *Scan this page* (extension) or *Scan screen* (Mac).
-* **Moving from Google Authenticator:** in the phone app, go to Transfer accounts → Export, then scan that QR with the Mac's *Scan screen* or by uploading a photo of it.
-
-## Tests
+Export an encrypted backup first (**Settings → Import & Export**) if you want to keep your accounts.
 
 ```bash
-node --test tests/*.test.mjs          # TOTP RFC vectors, vault crypto, merge, importers, Drive logic (11 tests)
-python3 tests/e2e_extension.py        # real Chrome: create/unlock, add, delete, autofill, anti-phishing, QR, import/export (35 checks)
-python3 tests/e2e_sync.py             # two browser profiles syncing through the Mac bridge protocol (16 checks)
-python3 tests/e2e_detect.py           # which fields count as 2FA boxes: Kite, GitHub, Google, AWS… and look-alikes (15 checks)
-python3 tests/swift_members.py        # every AppModel method the Mac views call actually exists
-cd mac && swift run TotemCoreCheck    # Swift core: opens a vault the extension wrote + RFC vectors (no Xcode needed)
+pkill -x Totem
+rm -rf /Applications/Totem.app ~/Totem
+rm -f ~/Library/Application\ Support/*/NativeMessagingHosts/com.totem.bridge.json \
+      ~/Library/Application\ Support/*/*/NativeMessagingHosts/com.totem.bridge.json
+# This deletes your vault on this Mac:
+rm -rf ~/Library/Application\ Support/Totem
 ```
 
-## Credits
+Then remove the extension in `chrome://extensions`.
+</details>
 
-QR scanning uses [jsQR](https://github.com/cozmo/jsQR) (Apache 2.0) and QR codes are drawn with [qrcode-generator](https://github.com/kazuhikoarase/qrcode-generator) (MIT). Their licenses are in `extension/lib/licenses/`. Totem itself is MIT licensed.
+## Security
 
-## Layout
+| Protection | How |
+|---|---|
+| Encryption | AES-256-GCM with a key from your master password (PBKDF2-SHA256, 600,000 rounds), everywhere the vault is stored |
+| Touch ID | The vault key is sealed by the Secure Enclave and is useless on any other Mac |
+| Anti-phishing | On an unsaved site, Totem shows the real address and asks before filling |
+| Browser isolation | Web pages never see secrets, only the code for their own site, and only when you ask |
+| Mac ⇄ browser link | A private local channel that only accepts Totem's own signed bridge |
+| Locking | Auto-lock on a timer, on screen lock and on sleep. Copied codes are cleared after 30 seconds. |
+
+No authenticator protects against malware already running on your Mac. Your master password also can't be recovered, so keep an encrypted export and your sites' recovery codes somewhere safe.
+
+## For developers
+
+```bash
+node --test tests/*.test.mjs          # TOTP vectors, vault crypto, merge, importers, Drive
+python3 tests/e2e_extension.py        # the extension in real Chrome (needs Playwright)
+python3 tests/e2e_sync.py             # two browsers syncing through the Mac bridge
+python3 tests/e2e_detect.py           # which fields count as 2FA boxes
+python3 tests/swift_members.py        # Mac views only call AppModel members that exist
+cd mac && swift run TotemCoreCheck    # Swift core reads the extension's vault format
+```
 
 ```
-extension/   Manifest V3 extension (background.js holds the key; popup.*; content.js = autofill; lib/ = shared logic)
-mac/         Swift package: TotemCore (vault/crypto/TOTP/importers), Totem (menu bar app), TotemBridge (native host)
-docs/        VAULT_FORMAT.md
-tests/       Node, Playwright, and the fake bridge used for sync tests
+extension/   Manifest V3 extension: background.js holds the key, content.js fills fields, lib/ shared logic
+mac/         Swift package: TotemCore (crypto, vault), Totem (menu bar app), TotemBridge (browser link)
+docs/        VAULT_FORMAT.md, the file format both apps share
+tests/       Node and Playwright tests
 ```
+
+## License
+
+MIT. QR scanning uses [jsQR](https://github.com/cozmo/jsQR) (Apache 2.0) and QR drawing uses [qrcode-generator](https://github.com/kazuhikoarase/qrcode-generator) (MIT).
