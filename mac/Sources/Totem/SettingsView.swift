@@ -138,17 +138,17 @@ struct SettingsView: View {
                     Text("Installing… Totem restarts by itself when it's done.").foregroundStyle(.secondary)
                 } else if let u = model.update {
                     Button("Install update \(u.version)") { model.installUpdate() }.buttonStyle(.borderedProminent)
-                    Text("Found \(u.zip.lastPathComponent) in Downloads.").font(.caption).foregroundStyle(.secondary)
+                    Text("Found on \(u.sourceLabel).").font(.caption).foregroundStyle(.secondary)
                 } else {
                     HStack {
-                        Button("Check Downloads for an update") {
-                            model.checkForUpdate()
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 1) { if model.update == nil { flash("No newer Totem zip in Downloads") } }
+                        Button("Check for updates") {
+                            model.checkForUpdate(force: true)
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 4) { if model.update == nil { flash("You're on the latest version") } }
                         }
                         Button("Install from a file…") { pickUpdate() }
                     }
                 }
-                Text("Download the newest ZIP from github.com/sanjuantala/authenticator, then click Install update. The browser extension updates itself too.")
+                Text("Totem checks github.com/sanjuantala/authenticator for new versions. Install update downloads and installs it; the browser extension updates itself too.")
                     .font(.caption).foregroundStyle(.secondary)
             }
             Section("Change master password") {

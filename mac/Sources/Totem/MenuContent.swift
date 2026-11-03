@@ -228,7 +228,7 @@ struct ListView: View {
                     Button { model.installUpdate() } label: {
                         Label("Install update \(u.version)", systemImage: "arrow.down.circle.fill").fontWeight(.semibold)
                     }
-                    .buttonStyle(.plain).foregroundStyle(Theme.brass).help("From \(u.zip.lastPathComponent) in Downloads")
+                    .buttonStyle(.plain).foregroundStyle(Theme.brass).help("From \(u.sourceLabel)")
                 } else {
                     Text("\(HotKeyLabel.current) opens quick search").foregroundStyle(Theme.mist)
                 }

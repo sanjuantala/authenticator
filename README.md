@@ -25,37 +25,30 @@ A private authenticator you own end to end: a **menu bar Mac app** and a **Chrom
 | Auto-lock (timer, screen lock, sleep) | ✓ | ✓ |
 | Hands out the *next* code in the last 2–3 seconds so it never expires mid-paste | ✓ | ✓ |
 
-## 1 · Install (first time, about 2 minutes)
+## 1 · Install (one line, about 2 minutes)
 
 Needs macOS 14+ and Apple's Command Line Tools (`xcode-select --install`). Full Xcode is not needed.
 
-On this page, click **Code → Download ZIP**, then paste this in Terminal:
+Paste this in Terminal:
 
 ```bash
-cd ~/Downloads && unzip -oq authenticator-main.zip && bash authenticator-main/install.sh
+curl -fsSL https://raw.githubusercontent.com/sanjuantala/authenticator/main/get.sh | bash
 ```
 
-Or with git:
-
-```bash
-git clone https://github.com/sanjuantala/authenticator.git ~/Totem/source && bash ~/Totem/source/install.sh
-```
-
-The installer:
+It downloads the latest version from this repo and installs everything:
 * keeps the source in `~/Totem/source`, so later updates build faster,
-* updates the extension in whatever folder your browsers already load it from (Chrome, Brave, Edge, Arc, Vivaldi, Chromium),
+* updates the extension in whatever folder your browsers already load it from (any Chromium browser),
 * builds `Totem.app`, puts it in `/Applications`, and starts it. The Totem mark appears in your menu bar.
 
 If the extension isn't loaded yet: open `chrome://extensions`, turn on **Developer mode**, click **Load unpacked**, and choose `~/Totem/source/extension` (press ⌘⇧G in the picker and paste the path). Then in Totem for Mac, go to **Settings → Backup & Browser → Connect browsers**, and in the extension choose **Use my Mac's vault with Touch ID**.
 
+Prefer to look before you run? Download the ZIP (**Code → Download ZIP**), read `install.sh`, then run `bash install.sh` from the unzipped folder.
+
 ## 2 · Updating (one click)
 
-1. Download the newest ZIP from this page (**Code → Download ZIP**) into Downloads.
-2. Open Totem in the menu bar and click **Install update** at the bottom of the window. Settings → General has the same button, plus **Install from a file…**.
+Totem checks this repo for new versions. When one is out, **Install update** appears at the bottom of Totem's menu. Click it: Totem downloads the update, installs it and restarts in about a minute. The browser extension notices its new files and reloads itself; unlock it once afterwards.
 
-Totem rebuilds itself and restarts in about a minute. The browser extension notices its new files within a minute and reloads itself; unlock it once afterwards. The update log is at `~/Library/Logs/Totem/update.log`.
-
-The first time, macOS asks whether Totem may look in your Downloads folder. Allow it so Totem can find updates.
+You can also check by hand in **Settings → General → Check for updates**, or run the same one-line command again. The update log is at `~/Library/Logs/Totem/update.log`.
 
 ## 3 · Google Drive backup (one click)
 

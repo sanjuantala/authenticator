@@ -1,11 +1,39 @@
 import AppKit
 import Foundation
 
-/// One-click updates: download the new zip (GitHub: Code → Download ZIP), then click "Install update" in Totem.
-/// Totem finds the zip in Downloads, unpacks it and runs its install.sh, which updates the browser
-/// extension in place, rebuilds this app and relaunches it. The extension reloads itself within a minute.
+/// One-click updates. Totem checks GitHub for a newer VERSION (or finds a downloaded zip in Downloads),
+/// downloads it, unpacks it and runs its install.sh, which updates the browser extension in place,
+/// rebuilds this app and relaunches it. The extension reloads itself within a minute.
 enum Updater {
-    struct Found: Equatable { let zip: URL; let version: String }
+    static let repo = "sanjuantala/authenticator"
+
+    /// A newer version: either a zip already in Downloads, or one still on GitHub (zip == nil).
+    struct Found: Equatable {
+        let zip: URL?
+        let version: String
+        var sourceLabel: String { zip.map { "\($0.lastPathComponent) in Downloads" } ?? "GitHub" }
+    }
+
+    /// The version published on GitHub, or nil when offline.
+    static func latestOnline() async -> String? {
+        guard let url = URL(string: "https://raw.githubusercontent.com/\(repo)/main/VERSION") else { return nil }
+        var req = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 10)
+        req.setValue("Totem/\(current)", forHTTPHeaderField: "User-Agent")
+        guard let result = try? await URLSession.shared.data(for: req),
+              (result.1 as? HTTPURLResponse)?.statusCode == 200 else { return nil }
+        let v = String(decoding: result.0, as: UTF8.self).trimmingCharacters(in: .whitespacesAndNewlines)
+        return v.range(of: "^[0-9]+(\\.[0-9]+)*$", options: .regularExpression) != nil ? v : nil
+    }
+
+    /// Downloads the newest source from GitHub into a temporary zip file.
+    static func downloadLatest() async throws -> URL {
+        guard let url = URL(string: "https://github.com/\(repo)/archive/refs/heads/main.zip") else { throw URLError(.badURL) }
+        let (tmp, res) = try await URLSession.shared.download(from: url)
+        guard (res as? HTTPURLResponse)?.statusCode == 200 else { throw URLError(.badServerResponse) }
+        let dest = FileManager.default.temporaryDirectory.appendingPathComponent("totem-update-\(UUID().uuidString).zip")
+        try FileManager.default.moveItem(at: tmp, to: dest)
+        return dest
+    }
 
     static var current: String { Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "0" }
     static let log = FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent("Library/Logs/Totem/update.log")

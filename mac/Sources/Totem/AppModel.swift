@@ -82,37 +82,41 @@ final class AppModel: ObservableObject {
 
     // MARK: updates
 
-    /// Looks in Downloads for a newer totem*.zip (runs when the menu opens).
-    func checkForUpdate() {
+    /// Looks for a newer version: a zip in Downloads first, then GitHub (at most once an hour unless forced).
+    func checkForUpdate(force: Bool = false) {
         guard !updating else { return }
+        let last = defaults.object(forKey: "lastOnlineUpdateCheck") as? Date ?? .distantPast
+        let askOnline = force || Date().timeIntervalSince(last) > 3600
         Task.detached(priority: .utility) {
-            let found = Updater.findDownloaded()
-            await MainActor.run { AppModel.shared.update = found }
+            var found = Updater.findDownloaded()
+            if found == nil, askOnline {
+                await MainActor.run { UserDefaults.standard.set(Date(), forKey: "lastOnlineUpdateCheck") }
+                if let v = await Updater.latestOnline(), Updater.isNewer(v, than: Updater.current) {
+                    found = Updater.Found(zip: nil, version: v)
+                }
+            }
+            let result = found
+            await MainActor.run {
+                if result != nil || askOnline { AppModel.shared.update = result }
+            }
         }
     }
 
     func installUpdate(_ zip: URL? = nil) {
-        guard let zip = zip ?? update?.zip else { return }
-        do {
-            try Updater.install(zip)
-            updating = true
-            say("Installing… Totem restarts by itself in about a minute.")
-        } catch {
-            say("Couldn't start the update: \(error.localizedDescription)")
-        }
-    }
-
-    func applyHotKey() {
-        let label = defaults.string(forKey: "hotkey") ?? HotKey.presets[0].label
-        let combo = HotKey.presets.first { $0.label == label } ?? HotKey.presets[0]
-        hotKey = nil
-        hotKey = HotKey(combo) { QuickPanel.shared.toggle() }
-    }
-
-    func say(_ text: String) {
-        toast = text
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2.4) { [weak self] in
-            if self?.toast == text { self?.toast = nil }
+        guard !updating else { return }
+        let chosen = zip ?? update?.zip
+        updating = true
+        say(chosen == nil ? "Downloading the update…" : "Installing…")
+        Task {
+            do {
+                let file: URL
+                if let chosen { file = chosen } else { file = try await Updater.downloadLatest() }
+                try Updater.install(file)
+                say("Installing… Totem restarts by itself in about a minute.")
+            } catch {
+                updating = false
+                say("Couldn't update: \(error.localizedDescription)")
+            }
         }
     }
 

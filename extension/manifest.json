@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Totem Authenticator",
   "short_name": "Totem",
-  "version": "1.2.1",
+  "version": "1.3.0",
   "description": "Your private 2FA codes. Encrypted vault, Mac app sync, Google Drive backup.",
   "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAkfdmLdJKj9lCvfZ/xnY0KXq6WDfeM2vDPtJ2vdnhx3308ztr+pb7mej1hOecGubtLCPnWic7XBRA90oKckiQCRGoezfVOP1hH13VJdv0Wnb58zUmgSJgGkE2MBYHVBe7E+DMz8DkkLc2bJRmF7qXzyjoLsvcq0/b+WhDI7p6P0GzbyqyzDvWGfE57zNnrk/BvYoSY03ZRJV2xDw+dCSV0AqhCzhwTLtHZ6CkCHx5VmIf1wAJee+2Z/RTN6pXF80Bho0ab0wvfO6W0vAPKYl54n1yyBoD56wDspSbDdD3V3KWQUPkZkxX0si5Wt5Dzv/qYGUIm7xPdMebpwOZBWqVCQIDAQAB",
   "icons": {
