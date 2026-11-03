@@ -33,7 +33,7 @@ elif t == "putVault":
     if not inc or inc.get("format") != "totem-vault":
         send({"ok": False, "error": "Not a Totem vault"})
     elif cur is not None and not req.get("force") and req.get("base") != cur.get("updatedAt"):
-        send({"ok": False, "error": "The Mac vault changed meanwhile — sync again", "code": "CONFLICT"})
+        send({"ok": False, "error": "The Mac vault changed meanwhile. Sync again.", "code": "CONFLICT"})
     else:
         json.dump(inc, open(VAULT, "w"), indent=2); send({"ok": True})
 elif t == "requestKey":

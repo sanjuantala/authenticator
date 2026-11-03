@@ -1,4 +1,4 @@
-// Totem — import/export. Supports:
+// Totem: import/export. Supports:
 //  • otpauth:// links (one per line, or any text containing them)
 //  • Google Authenticator "Transfer accounts" QR (otpauth-migration://offline?data=…)
 //  • Aegis (unencrypted JSON export)      • 2FAS (unencrypted .2fas export)
@@ -166,7 +166,7 @@ export function parseImport(text) {
 
 export function exportOtpAuthText(accounts) {
   return [
-    "# Totem plain export — THESE ARE UNENCRYPTED SECRETS. Delete this file after use.",
+    "# Totem plain export. THESE ARE UNENCRYPTED SECRETS. Delete this file after use.",
     ...accounts.map(toOtpAuthUri),
     "",
   ].join("\n");

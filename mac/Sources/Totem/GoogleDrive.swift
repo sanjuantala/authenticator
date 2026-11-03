@@ -57,7 +57,7 @@ final class GoogleDrive {
         if let err = params["error"] { throw DriveError.auth(err) }
         guard let code = params["code"] else { throw DriveError.auth("no code returned") }
         let tok = try await tokenRequest(["code": code, "code_verifier": verifier, "grant_type": "authorization_code", "redirect_uri": redirect])
-        guard let refresh = tok["refresh_token"] as? String else { throw DriveError.auth("no refresh token — remove Totem's access at myaccount.google.com/permissions and try again") }
+        guard let refresh = tok["refresh_token"] as? String else { throw DriveError.auth("no refresh token. Remove Totem's access at myaccount.google.com/permissions and try again") }
         Keychain.set(Data(refresh.utf8), for: "drive.refresh")
         store(tok)
     }

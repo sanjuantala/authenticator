@@ -180,7 +180,7 @@ struct SettingsView: View {
                     do {
                         let done = try BrowserBridge.install()
                         bridgeNote = done.isEmpty ? "No Chromium browsers found" : "Connected: \(done.joined(separator: ", "))"
-                        flash(done.isEmpty ? "No Chrome/Brave/Edge/Arc found" : "Done — reload the extension once")
+                        flash(done.isEmpty ? "No Chrome/Brave/Edge/Arc found" : "Done. Reload the extension once.")
                     } catch { flash(error.localizedDescription) }
                 }
                 Text("The extension and this app share one encrypted vault through a private local channel. Nothing goes over the network.")
@@ -258,7 +258,7 @@ struct SettingsView: View {
                     SecureField("That vault's password", text: $joinPw)
                     Button("Join and merge") {
                         Task {
-                            do { try await model.joinPending(password: joinPw); joinPw = ""; flash("Merged — one vault everywhere") }
+                            do { try await model.joinPending(password: joinPw); joinPw = ""; flash("Merged. One vault everywhere.") }
                             catch { flash(error.localizedDescription) }
                         }
                     }
@@ -327,7 +327,7 @@ struct SettingsView: View {
             Section("Export") {
                 Button("Encrypted backup (.totem)…") { export(encrypted: true) }.disabled(model.locked)
                 Button("Plain otpauth links (.txt)…") { export(encrypted: false) }.disabled(model.locked)
-                Text("The encrypted backup opens with your master password in Totem on any device. The plain file contains raw secrets — delete it after use.")
+                Text("The encrypted backup opens with your master password in Totem on any device. The plain file contains raw secrets, so delete it after use.")
                     .font(.caption).foregroundStyle(.secondary)
             }
             Section("Files") {

@@ -1,4 +1,4 @@
-// Totem — TOTP/HOTP (RFC 4226 / RFC 6238) using WebCrypto.
+// Totem: TOTP/HOTP (RFC 4226 / RFC 6238) using WebCrypto.
 // Works in the browser extension and in Node 20+ (globalThis.crypto.subtle).
 
 const B32 = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";

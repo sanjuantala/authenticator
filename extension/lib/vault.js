@@ -1,4 +1,4 @@
-// Totem — encrypted vault format, shared byte-for-byte with the Mac app.
+// Totem: encrypted vault format, shared byte-for-byte with the Mac app.
 // See docs/VAULT_FORMAT.md. PBKDF2-SHA256 (600k) -> AES-256-GCM, AAD "totem-vault-v1".
 
 import { normalizeSecret, normalizeAlgorithm, base32Decode } from "./totp.js";

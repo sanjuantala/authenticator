@@ -1,4 +1,4 @@
-// TotemBridge — Chrome native-messaging host.
+// TotemBridge: Chrome native-messaging host.
 // Chrome starts this for each message from the Totem extension (only that extension ID is allowed,
 // see the host manifest). It relays the message to the running Totem app over a user-only Unix socket.
 // If the app isn't running it can still read/write the *encrypted* vault file, so sync keeps working.
@@ -99,7 +99,7 @@ func offline(_ req: [String: Any]) -> [String: Any] {
         let base = number(req["base"])
         let force = req["force"] as? Bool ?? false
         if current != nil && !force && base != number(current?["updatedAt"]) {
-            return ["ok": false, "error": "The Mac vault changed meanwhile — sync again", "code": "CONFLICT"]
+            return ["ok": false, "error": "The Mac vault changed meanwhile. Sync again.", "code": "CONFLICT"]
         }
         do {
             try FileManager.default.createDirectory(at: supportDir, withIntermediateDirectories: true,

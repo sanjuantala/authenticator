@@ -1,4 +1,4 @@
-// Totem — Google Drive sync + backups (scope: drive.file → the app only sees files it created).
+// Totem: Google Drive sync + backups (scope: drive.file → the app only sees files it created).
 // Layout in your Drive:  /Totem Authenticator/totem-vault.json            ← live synced vault (encrypted)
 //                        /Totem Authenticator/backups/totem-backup-*.json  ← dated snapshots (encrypted)
 // Uses launchWebAuthFlow so it works in Chrome, Brave and Edge.

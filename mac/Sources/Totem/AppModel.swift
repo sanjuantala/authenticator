@@ -379,7 +379,7 @@ final class AppModel: ObservableObject {
         else if let password, !password.isEmpty { s = try Vault.session(password: password, for: env) }
         else { throw TotemError.kdfMismatch }
         let r = try add(try Vault.open(env, session: s).live) // brings back missing accounts, never wipes
-        return r.added > 0 ? "Brought back \(r.added) account\(r.added == 1 ? "" : "s")" : "Nothing missing — all accounts already here"
+        return r.added > 0 ? "Brought back \(r.added) account\(r.added == 1 ? "" : "s")" : "Nothing missing. All accounts are already here."
     }
 
     // MARK: browser bridge
@@ -427,13 +427,13 @@ final class AppModel: ObservableObject {
             let current = readEnvelope()
             let base = (req["base"] as? NSNumber)?.int64Value
             guard current == nil || force || base == current?.updatedAt else {
-                return ["ok": false, "error": "The Mac vault changed meanwhile — sync again", "code": "CONFLICT"]
+                return ["ok": false, "error": "The Mac vault changed meanwhile. Sync again.", "code": "CONFLICT"]
             }
             backupCurrentFile()
             try writeEnvelope(incoming)
             if !locked {
                 lock() // new key setup arrived (password changed in the browser)
-                say("Password changed in your browser — unlock with the new one")
+                say("Password changed in your browser. Unlock with the new one.")
             }
             return ["ok": true]
 

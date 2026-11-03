@@ -103,7 +103,7 @@ enum Clipboard {
     }
 }
 
-// MARK: - Global hotkey (Carbon — works without Accessibility permission)
+// MARK: - Global hotkey (Carbon, works without Accessibility permission)
 
 final class HotKey {
     struct Combo: Hashable, Identifiable {

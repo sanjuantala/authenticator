@@ -69,7 +69,7 @@ extension View { func totemField() -> some View { modifier(FieldStyle()) } }
 
 // MARK: - brand
 
-/// Three stacked brass tiles — the Totem mark.
+/// Three stacked brass tiles: the Totem mark.
 struct TotemMark: View {
     var scale: CGFloat = 1
     var body: some View {

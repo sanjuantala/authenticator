@@ -18,7 +18,7 @@ protocol BackupStore {
 }
 
 /// The easy way: write into the Google Drive folder that "Google Drive for desktop" keeps in sync.
-/// No Google Cloud project, no sign-in inside Totem — Google's own app uploads the (encrypted) files.
+/// No Google Cloud project and no sign-in inside Totem: Google's own app uploads the (encrypted) files.
 /// Works the same with iCloud Drive, Dropbox or any synced folder.
 ///
 ///   <folder>/Totem/totem-vault.json                   ← live vault, merged on every sync

@@ -9,7 +9,7 @@ let package = Package(
         .executable(name: "TotemBridge", targets: ["TotemBridge"]),
     ],
     targets: [
-        // Vault format, crypto, TOTP, merge, importers — shared logic, no UI.
+        // Vault format, crypto, TOTP, merge, importers: shared logic, no UI.
         .target(name: "TotemCore"),
         // Menu bar app.
         .executableTarget(name: "Totem", dependencies: ["TotemCore"]),

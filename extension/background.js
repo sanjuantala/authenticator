@@ -1,4 +1,4 @@
-// Totem — background service worker.
+// Totem: background service worker.
 // Secrets stay here. The popup gets codes; content scripts only ever get a code for the page's own site,
 // and only after you click the Totem button or use the shortcut.
 import * as V from "./lib/vault.js";
@@ -84,7 +84,7 @@ async function codes() {
 /**
  * Anti-phishing: a code is filled automatically ONLY on a site saved for that account
  * (exact host or its subdomain). A name-based guess ("github" in the address) is never
- * filled silently — the page shows the real address and asks you first, then remembers it.
+ * filled silently: the page shows the real address and asks you first, then remembers it.
  */
 const cleanHost = (h) => String(h || "").toLowerCase().replace(/^www\./, "");
 
@@ -185,7 +185,7 @@ async function syncAll({ interactive = false, forceBackup = false } = {}) {
       } catch (e) {
         r.failed = true;
         report[r.name] = { ok: false, error: e.code === "KDF_MISMATCH"
-          ? "Uses a different password setup — enter that vault's password in Settings to join it" : e.message, code: e.code };
+          ? "Uses a different password setup. Enter that vault's password in Settings to join it." : e.message, code: e.code };
         if (e.code === "KDF_MISMATCH") await chrome.storage.local.set({ pendingJoin: { source: r.name, env: r.env } });
       }
     }

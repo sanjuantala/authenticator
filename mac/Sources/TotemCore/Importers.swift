@@ -206,7 +206,7 @@ public enum Importer {
     }
 
     public static func plainExport(_ accounts: [Account]) -> String {
-        (["# Totem plain export — THESE ARE UNENCRYPTED SECRETS. Delete this file after use."] + accounts.map(OTPAuth.uri) + [""])
+        (["# Totem plain export. THESE ARE UNENCRYPTED SECRETS. Delete this file after use."] + accounts.map(OTPAuth.uri) + [""])
             .joined(separator: "\n")
     }
 }

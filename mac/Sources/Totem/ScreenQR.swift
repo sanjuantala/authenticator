@@ -3,7 +3,7 @@ import CoreImage.CIFilterBuiltins
 import ScreenCaptureKit
 import Vision
 
-/// Finds authenticator QR codes anywhere on your screens — no phone needed.
+/// Finds authenticator QR codes anywhere on your screens, no phone needed.
 enum ScreenQR {
     enum ScanError: LocalizedError {
         case permission, nothingFound

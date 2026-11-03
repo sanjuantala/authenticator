@@ -8,7 +8,7 @@ func check(_ name: String, _ body: () throws -> Bool) {
     do {
         if try body() { print("  ✓ \(name)") } else { print("  ✗ \(name)"); failures += 1 }
     } catch {
-        print("  ✗ \(name) — \(error.localizedDescription)"); failures += 1
+        print("  ✗ \(name): \(error.localizedDescription)"); failures += 1
     }
 }
 func b32(_ s: String) -> String { Base32.encode(Data(s.utf8)) }
@@ -93,7 +93,7 @@ check("Google Authenticator transfer QR") {
 }
 
 if failures > 0 {
-    print("\n\(failures) check(s) failed — don't use this build.")
+    print("\n\(failures) check(s) failed. Don't use this build.")
     exit(1)
 }
 print("\nAll checks passed.")

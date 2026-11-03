@@ -1,5 +1,5 @@
 #!/bin/bash
-# Installs or updates Totem — the Mac app and the browser extension — in one go.
+# Installs or updates Totem (the Mac app and the browser extension) in one go.
 #   First time:  bash ~/Downloads/totem/install.sh   (after unzipping)
 #   Later:       Totem's menu → "Install update" runs this for you.
 set -euo pipefail

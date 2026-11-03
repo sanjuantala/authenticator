@@ -1,4 +1,4 @@
-// Totem — spots 2FA code fields and offers a one-click fill.
+// Totem: spots 2FA code fields and offers a one-click fill.
 // It never sees secrets: it asks the background for "the code for this site" and gets only that.
 // Anti-phishing: on a site not yet saved for an account, it shows the real address and asks first.
 (() => {
@@ -192,12 +192,12 @@
     openPanel([header("Choose an account"), ...r.matches.map((m) => accountRow(m, () => done(m.code)))]);
   }
 
-  /** The page's real address, shown before the first fill on a site — this is what stops look-alike sites. */
+  /** The page's real address, shown before the first fill on a site. This is what stops look-alike sites. */
   function confirmSite(r) {
     const w = el("div", "warn");
     const p = el("p", null, "You're on ");
     p.append(el("span", "site", r.host));
-    w.append(p, el("div", "muted", "This site isn't saved for any account yet. Fill only if the address is exactly right — look-alike sites use names like these to steal codes."));
+    w.append(p, el("div", "muted", "This site isn't saved for any account yet. Fill only if the address is exactly right. Look-alike sites use names like these to steal codes."));
     const rows = r.candidates.map((c) => {
       const b = el("button", "btn", `Fill ${c.issuer || c.label} and remember this site`);
       b.addEventListener("mousedown", (e) => e.preventDefault());

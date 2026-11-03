@@ -1,4 +1,4 @@
-# Totem — your own 2FA authenticator
+# Totem: your own 2FA authenticator
 
 A private authenticator you own end to end: a **menu bar Mac app** and a **Chrome/Brave/Edge/Arc extension**. Both share **one encrypted vault**, sync directly on your Mac, and back up to **your Google Drive**. No third-party servers.
 
@@ -14,7 +14,7 @@ A private authenticator you own end to end: a **menu bar Mac app** and a **Chrom
 |---|---|---|
 | Codes with countdown ring, search, click to copy | ✓ | ✓ |
 | Unique "sigil" per service (same look on both) | ✓ | ✓ |
-| **Auto-fill**: a Totem button appears on 2FA fields; one click fills the code (split digit boxes too) | ✓ | — |
+| **Auto-fill**: a Totem button appears on 2FA fields; one click fills the code (split digit boxes too) | ✓ | No |
 | **Scan QR from screen**, no phone needed | open tab | any screen, any app |
 | **Global hotkey** quick search (Spotlight-style): Enter copies, ⇧Enter *types* the code into the app you're in | `Alt+Shift+T` opens, `Alt+Shift+F` fills | `⌥⌘2` (changeable) |
 | Unlock with **Touch ID** | via the Mac app | ✓ |

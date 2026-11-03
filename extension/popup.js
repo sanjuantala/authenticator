@@ -1,4 +1,4 @@
-// Totem — popup UI.
+// Totem: popup UI.
 import { strength } from "./lib/strength.js";
 
 const $ = (id) => document.getElementById(id);

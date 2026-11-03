@@ -3,7 +3,7 @@ import CryptoKit
 import CommonCrypto
 import Security
 
-// Byte-compatible with extension/lib/vault.js — see docs/VAULT_FORMAT.md.
+// Byte-compatible with extension/lib/vault.js. See docs/VAULT_FORMAT.md.
 
 public struct Account: Codable, Identifiable, Equatable, Hashable {
     public var id: String
