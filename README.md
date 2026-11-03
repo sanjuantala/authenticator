@@ -120,6 +120,7 @@ node --test tests/*.test.mjs          # TOTP RFC vectors, vault crypto, merge, i
 python3 tests/e2e_extension.py        # real Chrome: create/unlock, add, delete, autofill, anti-phishing, QR, import/export (35 checks)
 python3 tests/e2e_sync.py             # two browser profiles syncing through the Mac bridge protocol (16 checks)
 python3 tests/e2e_detect.py           # which fields count as 2FA boxes: Kite, GitHub, Google, AWS… and look-alikes (15 checks)
+python3 tests/swift_members.py        # every AppModel method the Mac views call actually exists
 cd mac && swift run TotemCoreCheck    # Swift core: opens a vault the extension wrote + RFC vectors (no Xcode needed)
 ```
 

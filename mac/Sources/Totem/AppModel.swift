@@ -120,6 +120,20 @@ final class AppModel: ObservableObject {
         }
     }
 
+    func applyHotKey() {
+        let label = defaults.string(forKey: "hotkey") ?? HotKey.presets[0].label
+        let combo = HotKey.presets.first { $0.label == label } ?? HotKey.presets[0]
+        hotKey = nil
+        hotKey = HotKey(combo) { QuickPanel.shared.toggle() }
+    }
+
+    func say(_ text: String) {
+        toast = text
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2.4) { [weak self] in
+            if self?.toast == text { self?.toast = nil }
+        }
+    }
+
     // MARK: vault file
 
     private func readEnvelope() -> Envelope? {

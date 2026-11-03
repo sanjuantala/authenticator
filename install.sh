@@ -27,26 +27,19 @@ EXT_PATHS="$(/usr/bin/python3 - "$EXT_ID" <<'PY'
 import glob, json, os, sys
 eid = sys.argv[1]
 base = os.path.expanduser("~/Library/Application Support")
-found = set()
-
-def is_totem(p):
-    try:
-        return json.load(open(os.path.join(p, "manifest.json"))).get("name") == "Totem Authenticator"
-    except Exception:
-        return False
+seen = {}
 
 def walk(node, under_id=False):
-    """Find unpacked-extension paths for our ID anywhere in a browser's settings files."""
+    """Collect unpacked-extension folders recorded for our ID in a browser's settings files."""
     if isinstance(node, dict):
         for k, v in node.items():
-            if k == "path" and isinstance(v, str) and under_id and os.path.isabs(v) and is_totem(v):
-                found.add(os.path.realpath(v))
+            if k == "path" and isinstance(v, str) and under_id and os.path.isabs(v):
+                seen[os.path.realpath(v)] = True
             walk(v, under_id or k == eid)
     elif isinstance(node, list):
         for v in node:
             walk(v, under_id)
 
-# every Chromium browser keeps per-profile settings files a few folders deep
 files = []
 for depth in ("*", "*/*", "*/*/*", "*/*/*/*"):
     files += glob.glob(f"{base}/{depth}/Preferences") + glob.glob(f"{base}/{depth}/Secure Preferences")
@@ -59,22 +52,39 @@ for f in files:
             walk(json.loads(text))
     except Exception:
         pass
-print("\n".join(sorted(found)))
+
+for p in sorted(seen):
+    manifest = os.path.join(p, "manifest.json")
+    try:
+        name = json.load(open(manifest)).get("name")
+        print(("OK" if name == "Totem Authenticator" else "OTHER") + "\t" + p)
+    except PermissionError:
+        print("BLOCKED\t" + p)          # macOS privacy: Terminal may not read Desktop/Documents
+    except FileNotFoundError:
+        print("MISSING\t" + p)          # the folder was moved or deleted
+    except Exception:
+        print("OTHER\t" + p)
 PY
 )"
 UPDATED=0
-while IFS= read -r p; do
+NEW_REAL="$(cd "$NEW_EXT" && pwd -P)"
+while IFS=$'\t' read -r state p; do
   [ -z "$p" ] && continue
-  if [ "$p" != "$(cd "$NEW_EXT" && pwd -P)" ]; then
-    find "${p:?}" -mindepth 1 -delete   # same folder, fresh files (the browser keeps loading this path)
-    cp -R "$NEW_EXT/." "$p/"
-  fi
-  echo "  extension updated in $p"
-  UPDATED=1
+  case "$state" in
+    OK)
+      if [ "$p" != "$NEW_REAL" ]; then
+        find "${p:?}" -mindepth 1 -delete   # same folder, fresh files (the browser keeps loading this path)
+        cp -R "$NEW_EXT/." "$p/"
+      fi
+      echo "  extension updated in $p"
+      UPDATED=1 ;;
+    BLOCKED) echo "  found the extension in $p, but macOS doesn't let Terminal read that folder (Desktop/Documents are protected)." ;;
+    MISSING) echo "  your browser points to $p, but that folder no longer exists." ;;
+  esac
 done <<< "$EXT_PATHS"
 if [ "$UPDATED" = 0 ]; then
-  echo "  No browser has Totem loaded from a folder yet, so the extension wasn't updated."
-  echo "  One time only: in chrome://extensions remove Totem, click Load unpacked and choose:"
+  echo "  The extension wasn't updated. One time only, switch it to Totem's own folder (not protected by macOS):"
+  echo "  in chrome://extensions remove Totem, click Load unpacked and choose:"
   echo "      $NEW_EXT"
   echo "  (In the folder picker press Cmd+Shift+G and paste that path.) Updates then reach it automatically."
 fi
