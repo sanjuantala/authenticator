@@ -27,7 +27,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         Task { @MainActor in
             AppModel.shared.bootstrap()
             // keep the browser bridge manifest pointing at this copy of the app
-            if !BrowserBridge.installedIn.isEmpty { try? BrowserBridge.install() }
+            if !BrowserBridge.installedIn.isEmpty { _ = try? BrowserBridge.install() }
         }
     }
 

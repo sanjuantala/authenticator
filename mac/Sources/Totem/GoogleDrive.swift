@@ -207,7 +207,7 @@ final class GoogleDrive {
 
 // MARK: - one-shot loopback HTTP receiver for the OAuth redirect
 
-final class LoopbackReceiver {
+final class LoopbackReceiver: @unchecked Sendable {   // all state changes happen on its own queue
     private let listener: NWListener
     private var continuation: CheckedContinuation<[String: String], Error>?
 

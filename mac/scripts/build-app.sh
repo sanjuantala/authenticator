@@ -55,10 +55,16 @@ codesign --force --sign - --identifier app.totem.mac "$APP"
 if [ "${1:-}" != "--no-install" ]; then
   echo "› Installing to /Applications…"
   pkill -x Totem 2>/dev/null || true
+  for _ in 1 2 3 4 5 6 7 8 9 10; do pgrep -x Totem >/dev/null || break; sleep 0.5; done   # let the old copy quit
   rm -rf /Applications/Totem.app
   cp -R "$APP" /Applications/
   rm -rf ./build                     # leave only /Applications/Totem.app (no duplicates in Spotlight)
-  open /Applications/Totem.app
+  # macOS needs a moment to register the new copy before it can open it (otherwise: error -600)
+  for attempt in 1 2 3 4 5; do
+    sleep 1
+    open /Applications/Totem.app 2>/dev/null && break
+    [ "$attempt" = 5 ] && echo "  (Open Totem from Applications yourself; it's installed.)"
+  done
   echo "✓ Totem is in your menu bar. Then: Settings → Sync & Backup → Connect browsers."
 else
   echo "✓ Built $APP"

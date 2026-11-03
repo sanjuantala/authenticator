@@ -27,20 +27,38 @@ EXT_PATHS="$(/usr/bin/python3 - "$EXT_ID" <<'PY'
 import glob, json, os, sys
 eid = sys.argv[1]
 base = os.path.expanduser("~/Library/Application Support")
-roots = ["Google/Chrome", "Google/Chrome Beta", "BraveSoftware/Brave-Browser", "Microsoft Edge", "Arc/User Data", "Chromium", "Vivaldi"]
 found = set()
-for r in roots:
-    for f in glob.glob(f"{base}/{r}/*/Preferences") + glob.glob(f"{base}/{r}/*/Secure Preferences"):
-        try:
-            p = json.load(open(f)).get("extensions", {}).get("settings", {}).get(eid, {}).get("path", "")
-        except Exception:
+
+def is_totem(p):
+    try:
+        return json.load(open(os.path.join(p, "manifest.json"))).get("name") == "Totem Authenticator"
+    except Exception:
+        return False
+
+def walk(node, under_id=False):
+    """Find unpacked-extension paths for our ID anywhere in a browser's settings files."""
+    if isinstance(node, dict):
+        for k, v in node.items():
+            if k == "path" and isinstance(v, str) and under_id and os.path.isabs(v) and is_totem(v):
+                found.add(os.path.realpath(v))
+            walk(v, under_id or k == eid)
+    elif isinstance(node, list):
+        for v in node:
+            walk(v, under_id)
+
+# every Chromium browser keeps per-profile settings files a few folders deep
+files = []
+for depth in ("*", "*/*", "*/*/*", "*/*/*/*"):
+    files += glob.glob(f"{base}/{depth}/Preferences") + glob.glob(f"{base}/{depth}/Secure Preferences")
+for f in files:
+    try:
+        if os.path.getsize(f) > 50_000_000:
             continue
-        if p and os.path.isabs(p) and os.path.isfile(os.path.join(p, "manifest.json")):
-            try:
-                if json.load(open(os.path.join(p, "manifest.json"))).get("name") == "Totem Authenticator":
-                    found.add(os.path.realpath(p))
-            except Exception:
-                pass
+        text = open(f, encoding="utf-8", errors="ignore").read()
+        if eid in text:
+            walk(json.loads(text))
+    except Exception:
+        pass
 print("\n".join(sorted(found)))
 PY
 )"
@@ -55,8 +73,10 @@ while IFS= read -r p; do
   UPDATED=1
 done <<< "$EXT_PATHS"
 if [ "$UPDATED" = 0 ]; then
-  echo "  extension is ready in $NEW_EXT"
-  echo "  → In chrome://extensions turn on Developer mode, click Load unpacked, and choose that folder (one time only)."
+  echo "  No browser has Totem loaded from a folder yet, so the extension wasn't updated."
+  echo "  One time only: in chrome://extensions remove Totem, click Load unpacked and choose:"
+  echo "      $NEW_EXT"
+  echo "  (In the folder picker press Cmd+Shift+G and paste that path.) Updates then reach it automatically."
 fi
 
 # 3. Build and install the Mac app (it quits the running copy and opens the new one)
