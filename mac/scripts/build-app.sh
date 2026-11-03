@@ -57,6 +57,7 @@ if [ "${1:-}" != "--no-install" ]; then
   pkill -x Totem 2>/dev/null || true
   rm -rf /Applications/Totem.app
   cp -R "$APP" /Applications/
+  rm -rf ./build                     # leave only /Applications/Totem.app (no duplicates in Spotlight)
   open /Applications/Totem.app
   echo "✓ Totem is in your menu bar. Then: Settings → Sync & Backup → Connect browsers."
 else
