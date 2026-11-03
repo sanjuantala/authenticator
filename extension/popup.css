@@ -197,3 +197,14 @@ code.copyable { font: 11px/1.5 var(--mono); background: var(--slate-2); padding:
   box-shadow: 0 10px 30px rgba(0,0,0,.3); animation: rise .18s ease-out; }
 @keyframes rise { from { transform: translate(-50%, 6px); opacity: 0; } }
 @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+/* in-popup confirmation (browser confirm()/prompt() can close an extension popup) */
+.dialog-scrim { position: fixed; inset: 0; z-index: 20; display: grid; place-items: center; padding: 20px;
+  background: color-mix(in srgb, var(--ink) 70%, transparent); backdrop-filter: blur(3px); }
+.dialog { width: 100%; background: var(--slate); border: 1px solid var(--line); border-radius: var(--radius-l); padding: 18px;
+  display: flex; flex-direction: column; gap: 10px; box-shadow: 0 24px 60px rgba(0,0,0,.4); }
+.dialog h2 { font-size: 15.5px; }
+.dialog p { margin: 0; color: var(--mist); font-size: 13px; }
+.dialog .error { text-align: left; min-height: 0; }
+.dialog .row2 { margin-top: 4px; }
+.dialog .btn.primary.danger { background: var(--rose); color: #fff; }

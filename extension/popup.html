@@ -172,6 +172,19 @@
     </div>
   </section>
 
+  <div id="dialog" class="dialog-scrim" hidden>
+    <form class="dialog" role="alertdialog" aria-modal="true" aria-labelledby="dlgTitle" aria-describedby="dlgText">
+      <h2 id="dlgTitle"></h2>
+      <p id="dlgText"></p>
+      <input id="dlgInput" hidden autocomplete="off">
+      <p class="error" id="dlgError" role="alert"></p>
+      <div class="row2">
+        <button type="button" class="btn quiet" id="dlgCancel">Cancel</button>
+        <button type="submit" class="btn primary" id="dlgOk">OK</button>
+      </div>
+    </form>
+  </div>
+
   <div id="toast" class="toast" role="status" hidden></div>
   <canvas id="canvas" hidden></canvas>
 

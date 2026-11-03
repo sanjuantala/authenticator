@@ -63,6 +63,20 @@ check("Merge: a delete beats an older edit, duplicates are skipped") {
         && Vault.add([Account(issuer: "Google", label: "x", secret: "GEZD GNBV GY3T QOJQ")], to: &dup).added == 0
 }
 
+check("Delete removes an account from the codes and the saved vault") {
+    let s = try Vault.session(password: "interop-password",
+                              for: Vault.decodeEnvelope(Data(contentsOf: URL(fileURLWithPath: fixture))))
+    var d = VaultData()
+    Vault.add([Account(issuer: "Baystate", label: "", secret: "JBSWY3DPEHPK3PXP"),
+               Account(issuer: "GitHub", label: "me", secret: "GEZDGNBVGY3TQOJQ")], to: &d)
+    let id = d.live.first { $0.issuer == "Baystate" }!.id
+    Vault.delete(id, in: &d)
+    let reopened = try Vault.open(try Vault.seal(d, session: s, device: "check"), session: s)
+    return d.live.map(\.issuer) == ["GitHub"] && reopened.live.map(\.issuer) == ["GitHub"]
+        && reopened.accounts.first { $0.id == id }?.deleted == true
+        && reopened.accounts.first { $0.id == id }?.secret == ""
+}
+
 check("otpauth links and Aegis import") {
     let a = try OTPAuth.parse("otpauth://totp/ACME%20Co:john@example.com?secret=JBSWY3DPEHPK3PXP&issuer=ACME%20Co&algorithm=SHA256&digits=8&period=60")
     let back = try OTPAuth.parse(OTPAuth.uri(a))

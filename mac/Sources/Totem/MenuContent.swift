@@ -386,9 +386,25 @@ struct EditView: View {
                 TextField("github.com", text: $domains).totemField()
                 Text("Codes fill automatically only on these sites. Separate with commas.").font(.system(size: 11)).foregroundStyle(Theme.mist)
                 Button("Save", action: save).buttonStyle(PrimaryButtonStyle()).padding(.top, 4)
-                HStack(spacing: 8) {
-                    Button(showQR ? "Hide QR code" : "Show QR for a phone") { showQR.toggle() }.buttonStyle(QuietButtonStyle())
-                    Button("Delete") { confirmDelete = true }.buttonStyle(QuietButtonStyle(destructive: true))
+                if confirmDelete {
+                    // Inline, not a system dialog: a dialog makes the menu bar panel close and the click is lost.
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Delete \(a.title)?").font(.system(size: 13.5, weight: .semibold))
+                        Text("Make sure two-factor is turned off on that site, or you have another way in.")
+                            .font(.system(size: 12)).foregroundStyle(Theme.mist).fixedSize(horizontal: false, vertical: true)
+                        HStack(spacing: 8) {
+                            Button("Cancel") { confirmDelete = false }.buttonStyle(QuietButtonStyle())
+                            Button("Delete") { deleteNow() }.buttonStyle(QuietButtonStyle(destructive: true))
+                        }
+                    }
+                    .padding(12)
+                    .background(RoundedRectangle(cornerRadius: 12, style: .continuous).fill(Theme.rose.opacity(0.08)))
+                    .overlay(RoundedRectangle(cornerRadius: 12, style: .continuous).strokeBorder(Theme.rose.opacity(0.35)))
+                } else {
+                    HStack(spacing: 8) {
+                        Button(showQR ? "Hide QR code" : "Show QR for a phone") { showQR.toggle() }.buttonStyle(QuietButtonStyle())
+                        Button("Delete") { confirmDelete = true; showQR = false }.buttonStyle(QuietButtonStyle(destructive: true))
+                    }
                 }
                 if showQR, let img = ScreenQR.image(for: OTPAuth.uri(a)) {
                     VStack(spacing: 6) {
@@ -406,11 +422,16 @@ struct EditView: View {
             guard let a = model.account(id) else { return }
             issuer = a.issuer; label = a.label; domains = a.domains.joined(separator: ", ")
         }
-        .confirmationDialog("Delete this account?", isPresented: $confirmDelete) {
-            Button("Delete", role: .destructive) {
-                try? model.delete(id); model.screen = .list; model.say("Deleted")
-            }
-        } message: { Text("Make sure two-factor is turned off on that site, or you have another way in.") }
+    }
+
+    private func deleteNow() {
+        do {
+            try model.delete(id)
+            model.screen = .list
+            model.say("Deleted")
+        } catch {
+            model.say("Couldn't delete: \(error.localizedDescription)")
+        }
     }
 
     private func save() {

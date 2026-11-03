@@ -76,6 +76,42 @@ function meter(el, pw) {
   return r;
 }
 
+/**
+ * In-popup confirmation. Returns true/false, or the typed text (null if cancelled) when `input` is set.
+ * `requireText`: the OK button only works once the user types exactly that word.
+ */
+function ask({ title, message, ok = "OK", danger = false, input = null, requireText = null }) {
+  return new Promise((resolve) => {
+    const box = $("dialog"), form = box.querySelector("form"), field = $("dlgInput");
+    $("dlgTitle").textContent = title;
+    $("dlgText").textContent = message || "";
+    $("dlgError").textContent = "";
+    $("dlgOk").textContent = ok;
+    $("dlgOk").classList.toggle("danger", danger);
+    field.hidden = !input && !requireText;
+    field.type = input?.type || "text";
+    field.placeholder = input?.placeholder || (requireText ? `Type ${requireText}` : "");
+    field.value = "";
+    box.hidden = false;
+    (field.hidden ? $("dlgCancel") : field).focus();
+    const done = (value) => {
+      box.hidden = true;
+      form.onsubmit = null; $("dlgCancel").onclick = null; box.onkeydown = null;
+      resolve(value);
+    };
+    form.onsubmit = (e) => {
+      e.preventDefault();
+      if (requireText && field.value.trim().toLowerCase() !== requireText) {
+        $("dlgError").textContent = `Type ${requireText} to confirm`;
+        return;
+      }
+      done(input ? field.value : true);
+    };
+    $("dlgCancel").onclick = () => done(input ? null : false);
+    box.onkeydown = (e) => { if (e.key === "Escape") { e.preventDefault(); e.stopPropagation(); done(input ? null : false); } };
+  });
+}
+
 // ---------- boot ----------
 async function boot() {
   try {
@@ -277,6 +313,7 @@ async function copy(id) {
 
 $("q").addEventListener("input", () => { sel = 0; render(); });
 document.addEventListener("keydown", (e) => {
+  if (!$("dialog").hidden) return;
   if ($("main").hidden) {
     if (e.key === "Escape" && $("lock").hidden) { e.preventDefault(); back(); }
     return;
@@ -429,7 +466,9 @@ $("editForm").addEventListener("submit", async (e) => {
   back();
 });
 $("eDelete").addEventListener("click", async () => {
-  if (!confirm(`Delete ${editing.issuer || editing.label}? Make sure two-factor is turned off on that site, or you have another way in.`)) return;
+  const ok = await ask({ title: `Delete ${editing.issuer || editing.label || "this account"}?`,
+    message: "Make sure two-factor is turned off on that site, or you have another way in.", ok: "Delete", danger: true });
+  if (!ok) return;
   await send("remove", { id: editing.id });
   toast("Deleted");
   back();
@@ -541,7 +580,7 @@ $("showBackups").addEventListener("click", async () => {
           try { r = await send("restoreBackup", { id: b.id }); }
           catch (e) {
             if (e.code !== "KDF_MISMATCH") throw e;
-            const pw = prompt("This backup used an older password. Enter it:");
+            const pw = await ask({ title: "Older password", message: "This backup was made with an older master password. Enter it to restore.", ok: "Restore", input: { type: "password", placeholder: "Older master password" } });
             if (!pw) return;
             r = await send("restoreBackup", { id: b.id, password: pw });
           }
@@ -568,7 +607,7 @@ async function runImport(text) {
   try {
     let r = await send("importText", { text });
     if (r.needsPassword) {
-      const pw = prompt("Password for that Totem backup:");
+      const pw = await ask({ title: "Backup password", message: "Enter the master password this Totem backup was made with.", ok: "Import", input: { type: "password", placeholder: "Backup password" } });
       if (!pw) return;
       r = await send("importText", { text, password: pw });
     }
@@ -602,7 +641,8 @@ $("exportEnc").addEventListener("click", async () => {
   toast("Saved. It opens with your master password.");
 });
 $("exportPlain").addEventListener("click", async () => {
-  if (!confirm("This file will contain your two-factor secrets in plain text. Anyone with it can generate your codes. Continue?")) return;
+  const ok = await ask({ title: "Export unencrypted secrets?", message: "This file contains your two-factor secrets in plain text. Anyone with it can generate your codes. Delete it after use.", ok: "Export", danger: true });
+  if (!ok) return;
   const { text } = await send("exportPlain");
   download(`totem-plain-${stamp()}.txt`, text, "text/plain");
 });
@@ -620,8 +660,8 @@ $("cpBtn").addEventListener("click", async () => {
   } catch (e) { toast(e.message, 3000); }
 });
 $("resetBtn").addEventListener("click", async () => {
-  if (!confirm("Erase the vault from this browser? Your Mac app and Google Drive copies stay as they are.")) return;
-  if (prompt('Type "erase" to confirm') !== "erase") return;
+  const ok = await ask({ title: "Erase Totem from this browser?", message: "Your Mac app and Google Drive copies stay as they are.", ok: "Erase", danger: true, requireText: "erase" });
+  if (!ok) return;
   await send("reset");
   state = await send("state");
   showLock();

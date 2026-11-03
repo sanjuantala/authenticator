@@ -167,6 +167,43 @@ def main():
         check("Totem backup import restores accounts", r.get("added") == 3, str(r))
         popup.wait_for_timeout(1200)
         popup.screenshot(path=f"{OUT}/5-restored-dark.png")
+
+        # delete through the real UI, confirmed inside the popup (browser dialogs can close a real popup)
+        native = []
+        popup.on("dialog", lambda d: (native.append(d.message), d.dismiss()))
+        n0 = popup.locator(".acct").count()
+        row = popup.locator(".acct").first
+        name = row.locator(".name").inner_text()
+        row.hover(); row.locator(".more").click(); popup.wait_for_selector("#edit:not([hidden])")
+        popup.click("#eDelete"); popup.wait_for_selector("#dialog:not([hidden])")
+        check("delete asks inside the popup", name in popup.inner_text("#dlgTitle"), popup.inner_text("#dlgTitle"))
+        shown = popup.evaluate("""() => { let el = document.querySelector('#dialog .dialog'); const r = el.getBoundingClientRect();
+          for (; el; el = el.parentElement) if (+getComputedStyle(el).opacity < 1) return false; return r.width > 0 && r.height > 0; }""")
+        check("the dialog is actually visible on screen", shown)
+        popup.wait_for_timeout(350); popup.screenshot(path=f"{OUT}/9-delete-confirm.png")
+        popup.click("#dlgCancel"); popup.wait_for_timeout(200)
+        check("cancel keeps the account open", popup.locator("#dialog").is_hidden() and popup.locator("#edit").is_visible())
+        popup.click("#eDelete"); popup.wait_for_selector("#dialog:not([hidden])")
+        popup.keyboard.press("Escape"); popup.wait_for_timeout(200)
+        check("Escape closes the dialog without deleting", popup.locator("#dialog").is_hidden() and popup.locator("#edit").is_visible())
+        popup.click("#eDelete"); popup.click("#dlgOk"); popup.wait_for_selector("#main:not([hidden])")
+        popup.wait_for_timeout(1300)
+        check("Delete removes the account", popup.locator(".acct").count() == n0 - 1 and name not in popup.inner_text("#list"),
+              f"{popup.locator('.acct').count()} rows")
+        gone = popup.evaluate("(n) => chrome.runtime.sendMessage({type:'codes'}).then(r => r.codes.some(c => c.issuer === n))", name)
+        check("deleted account is gone from the vault", gone is False)
+
+        # the other confirmations are in-popup too
+        popup.click("#settingsBtn"); popup.wait_for_selector("#settings:not([hidden])")
+        popup.click("#exportPlain"); popup.wait_for_selector("#dialog:not([hidden])")
+        check("plain export warns inside the popup", "unencrypted" in popup.inner_text("#dlgTitle").lower())
+        popup.click("#dlgCancel")
+        popup.click("#resetBtn"); popup.wait_for_selector("#dialog:not([hidden])")
+        popup.click("#dlgOk"); popup.wait_for_timeout(200)
+        check("erase needs the word erase typed", "Type erase" in popup.inner_text("#dlgError") and popup.evaluate("chrome.runtime.sendMessage({type:'state'}).then(s => s.hasVault)"))
+        popup.click("#dlgCancel")
+        check("no browser-native dialogs were used", not native, str(native))
+        popup.click("#settings [data-back]")
         popup.emulate_media(color_scheme="light"); popup.wait_for_timeout(300)
         popup.screenshot(path=f"{OUT}/7-light.png")
         popup.evaluate("chrome.runtime.sendMessage({type:'lock'})"); popup.reload(); popup.wait_for_selector("#lock:not([hidden])")
