@@ -1,0 +1,17 @@
+# build output
+mac/.build/
+mac/build/
+node_modules/
+
+# never commit personal vaults or exports
+*.totem
+totem-plain-*.txt
+totem-backup-*.json
+vault.json
+vault.before-*.json
+touchid.key
+
+# local test helpers and OS files
+tests/.fake_dir
+__pycache__/
+.DS_Store

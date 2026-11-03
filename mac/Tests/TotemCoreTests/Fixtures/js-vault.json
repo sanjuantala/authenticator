@@ -1,0 +1,16 @@
+{
+  "format": "totem-vault",
+  "version": 1,
+  "kdf": {
+    "alg": "PBKDF2-SHA256",
+    "iterations": 1000,
+    "salt": "BwcHBwcHBwcHBwcHBwcHBw=="
+  },
+  "cipher": {
+    "alg": "AES-256-GCM",
+    "iv": "Twlaml4/1M9CllmY",
+    "data": "E30vk9UYHpZ6rM5eotqDN+B56U66wW8khf+TJOnkN+OGY/c+cHGSI4KJ2fEWVRKGSuRFhX2SfV+Y8f4M9/cCRUV1M/j5btXagfeJEzdUHQ+A29e8pUfVlqIYn3wSaWJZFCXhswjnQ/6ws+9UXJgTUWHoqRy973rTRHZvehuDZEPI51EkADpCmxFNp+qayLSbnWKH7/QJpwNAk0vihI+LY7iOGL+DW0858Ux93EEZB3vENATA98xpG1g1uNkcrBMGfCeao+l/ty7zQeAZgmmPRnJNkigeO7bCv/olYSeJCrQHWMQHxpJhJ9iKVKqo0dAWKwywAdWPr7xZed8AIEDgBxkuo6VDiPCrfkCDUt51pkO/+styJQ=="
+  },
+  "updatedAt": 2,
+  "device": "fixture"
+}
