@@ -189,6 +189,16 @@ struct SettingsView: View {
             Section("Backup") {
                 if let folder = FolderBackup.chosen {
                     LabeledContent("Saving to", value: FolderBackup.describe(folder))
+                    LabeledContent("Folder", value: FolderBackup.googleAccount(folder) != nil ? "My Drive › Totem" : "\(folder.lastPathComponent) › Totem")
+                    HStack {
+                        Button("Show in Finder") {
+                            let dir = folder.appendingPathComponent("Totem", isDirectory: true)
+                            NSWorkspace.shared.activateFileViewerSelecting([dir.appendingPathComponent("totem-vault.json")])
+                        }
+                        if let link = FolderBackup.webLink(folder) {
+                            Button("Open in Google Drive") { NSWorkspace.shared.open(link) }
+                        }
+                    }
                     LabeledContent("Last backup", value: model.backupStatus.isEmpty
                                    ? (model.lastBackupAt?.formatted(date: .abbreviated, time: .shortened) ?? "Not yet") : model.backupStatus)
                     HStack {

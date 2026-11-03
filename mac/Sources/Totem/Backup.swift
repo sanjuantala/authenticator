@@ -59,6 +59,36 @@ struct FolderBackup: BackupStore {
         return FileManager.default.fileExists(atPath: u.path) ? u : nil
     }
 
+    /// The Google account a Drive for desktop folder belongs to (from its CloudStorage folder name).
+    static func googleAccount(_ url: URL) -> String? {
+        let p = url.path
+        guard p.contains("/CloudStorage/GoogleDrive-") else { return nil }
+        let email = p.components(separatedBy: "/CloudStorage/GoogleDrive-").last?.components(separatedBy: "/").first ?? ""
+        return email.isEmpty ? nil : email
+    }
+
+    /// Web link to the Totem backup folder in Google Drive, signed in as the right account.
+    /// Uses the folder's Drive ID that Google Drive for desktop attaches to it; falls back to a search.
+    static func webLink(_ root: URL) -> URL? {
+        guard let account = googleAccount(root) else { return nil }
+        let folder = root.appendingPathComponent("Totem", isDirectory: true)
+        let user = account.addingPercentEncoding(withAllowedCharacters: .alphanumerics) ?? account
+        if let id = driveItemID(folder) {
+            return URL(string: "https://drive.google.com/drive/folders/\(id)?authuser=\(user)")
+        }
+        return URL(string: "https://drive.google.com/drive/search?q=Totem&authuser=\(user)")
+    }
+
+    private static func driveItemID(_ url: URL) -> String? {
+        let name = "com.google.drivefs.item-id#S"
+        let size = getxattr(url.path, name, nil, 0, 0, 0)
+        guard size > 0 else { return nil }
+        var buf = [UInt8](repeating: 0, count: size)
+        guard getxattr(url.path, name, &buf, size, 0, 0) == size else { return nil }
+        let id = String(decoding: buf, as: UTF8.self).trimmingCharacters(in: .whitespacesAndNewlines)
+        return id.range(of: "^[A-Za-z0-9_-]+$", options: .regularExpression) != nil ? id : nil
+    }
+
     static func describe(_ url: URL) -> String {
         let p = url.path
         if p.contains("/CloudStorage/GoogleDrive-") {
